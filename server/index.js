@@ -17,10 +17,15 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"],
+    origin: [
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+      "http://localhost:3000",
+      "https://tasker-tm.netlify.app",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -31,6 +36,10 @@ app.use(cookieParser());
 
 app.use(morgan("dev"));
 app.use("/api", routes);
+
+app.get("/", (req, res) => {
+  res.send("API is running");
+});
 
 app.use(routeNotFound);
 app.use(errorHandler);
