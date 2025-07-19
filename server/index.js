@@ -22,6 +22,7 @@ app.use(
       "http://127.0.0.1:5173",
       "http://localhost:3000",
       "https://tasker-tm.netlify.app",
+      "https://tasker-pm.vercel.app",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
