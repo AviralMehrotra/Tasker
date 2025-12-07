@@ -38,6 +38,10 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 app.use("/api", routes);
 
+app.get("/healthz", (req, res) => {
+  res.status(200).send("ok");
+});
+
 app.get("/", (req, res) => {
   res.send("API is running");
 });
