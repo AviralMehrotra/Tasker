@@ -1,6 +1,6 @@
 # Tasker
 
-A full-stack Task Management application built with React, Redux Toolkit, Node.js, Express, and MongoDB. This app allows teams to manage tasks, assign users, track progress, and handle notifications with a modern, responsive UI.
+A full-stack Project Management application built with React, Redux Toolkit, Node.js, Express, and MongoDB. This app allows teams to manage tasks, assign users, track progress, and handle notifications with a modern, responsive UI.
 
 ---
 
