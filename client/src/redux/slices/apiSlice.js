@@ -6,6 +6,6 @@ const baseQuery = fetchBaseQuery({ baseUrl: API_URI });
 
 export const apiSlice = createApi({
   baseQuery,
-  tagTypes: [],
+  tagTypes: ["Notifications"],
   endpoints: (builder) => ({}),
 });

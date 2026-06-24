@@ -10,6 +10,7 @@ export const postApiSlice = apiSlice.injectEndpoints({
         body: data,
         credentials: "include",
       }),
+      invalidatesTags: ["Notifications"],
     }),
 
     duplicateTask: builder.mutation({

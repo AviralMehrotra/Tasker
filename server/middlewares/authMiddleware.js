@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 
@@ -14,7 +15,7 @@ const protectRoute = async (req, res, next) => {
       req.user = {
         email: resp.email,
         isAdmin: resp.isAdmin,
-        userId: decodedToken.userId,
+        userId: new mongoose.Types.ObjectId(decodedToken.userId),
       };
 
       next();

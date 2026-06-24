@@ -105,11 +105,12 @@ export const getNotificationsList = async (req, res) => {
   try {
     const { userId } = req.user;
 
-    const notice = await Notice.findOne({
+    const notice = await Notice.find({
       team: userId,
       isRead: { $nin: [userId] },
-    }).populate("task", "title");
-    // .sort({ _id: -1 });
+    })
+      .populate("task", "title")
+      .sort({ _id: -1 });
 
     res.status(200).json(notice);
   } catch (error) {

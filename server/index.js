@@ -42,6 +42,16 @@ app.get("/healthz", (req, res) => {
   res.status(200).send("ok");
 });
 
+app.get("/debug/notices", async (req, res) => {
+  try {
+    const Notice = (await import("./models/notice.js")).default;
+    const all = await Notice.find({}).populate("task", "title").lean();
+    res.json({ count: all.length, notices: all });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.get("/", (req, res) => {
   res.send("API is running");
 });

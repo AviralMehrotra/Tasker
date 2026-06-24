@@ -29,7 +29,7 @@ const NotificationPanel = () => {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(null);
 
-  const { data, refetch } = useGetNotificationsQuery();
+  const { data } = useGetNotificationsQuery();
   const [markAsRead] = useMarkNotificationAsReadMutation();
 
   const viewHandler = (el) => {
@@ -40,8 +40,6 @@ const NotificationPanel = () => {
 
   const readHandler = async (type, id) => {
     await markAsRead({ type, id }).unwrap();
-
-    refetch();
   };
 
   const callsToAction = [
@@ -78,11 +76,10 @@ const NotificationPanel = () => {
           leaveTo="opacity-0 translate-y-1"
         >
           <PopoverPanel className="absolute -right-16 md:-right-2 z-10 mt-5 flex w-screen max-w-max  px-4">
-            {({ close }) =>
-              data?.length > 0 && (
+            {({ close }) => (
                 <div className="w-screen max-w-md flex-auto overflow-hidden rounded-3xl bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
                   <div className="p-4">
-                    {data?.slice(0, 5).map((item, index) => (
+                    {data?.length > 0 ? data?.slice(0, 5).map((item, index) => (
                       <div
                         key={item._id + index}
                         className="group relative flex gap-x-4 rounded-lg p-4 hover:bg-gray-50"
@@ -106,7 +103,9 @@ const NotificationPanel = () => {
                           </p>
                         </div>
                       </div>
-                    ))}
+                    )) : (
+                      <p className="text-center text-gray-500 py-4">No new notifications</p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 divide-x bg-gray-50">
