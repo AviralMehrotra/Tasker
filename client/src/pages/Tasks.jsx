@@ -74,9 +74,9 @@ const Tasks = () => {
 
           {(() => {
             if (selected === 0) {
-              return <BoardView tasks={data?.tasks} />;
+              return <BoardView tasks={data?.tasks || []} />;
             } else {
-              return <Table tasks={data?.tasks} />;
+              return <Table tasks={data?.tasks || []} />;
             }
           })()}
         </Tabs>

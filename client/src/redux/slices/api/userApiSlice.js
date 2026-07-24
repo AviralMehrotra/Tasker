@@ -10,6 +10,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
         body: data,
         credentials: "include",
       }),
+      invalidatesTags: ["User"],
     }),
 
     getTeamLists: builder.query({
@@ -18,6 +19,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
         method: "GET",
         credentials: "include",
       }),
+      providesTags: ["User"],
     }),
 
     getUserTaskStatus: builder.query({
@@ -26,6 +28,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
         method: "GET",
         credentials: "include",
       }),
+      providesTags: ["User"],
     }),
 
     getNotifications: builder.query({
@@ -43,6 +46,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
         method: "DELETE",
         credentials: "include",
       }),
+      invalidatesTags: ["User"],
     }),
 
     userAction: builder.mutation({
@@ -52,6 +56,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
         body: data,
         credentials: "include",
       }),
+      invalidatesTags: ["User"],
     }),
 
     markNotificationAsRead: builder.mutation({

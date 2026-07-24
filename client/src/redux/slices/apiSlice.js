@@ -1,11 +1,25 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { logout } from "./authSlice";
 
 const API_URI = import.meta.env.VITE_SERVER_API;
 
-const baseQuery = fetchBaseQuery({ baseUrl: API_URI });
+const baseQuery = fetchBaseQuery({
+  baseUrl: API_URI,
+  credentials: "include",
+});
+
+const baseQueryWithReauth = async (args, api, extraOptions) => {
+  let result = await baseQuery(args, api, extraOptions);
+
+  if (result?.error?.status === 401) {
+    api.dispatch(logout());
+  }
+
+  return result;
+};
 
 export const apiSlice = createApi({
-  baseQuery,
-  tagTypes: ["Notifications"],
+  baseQuery: baseQueryWithReauth,
+  tagTypes: ["Task", "User", "Notifications"],
   endpoints: (builder) => ({}),
 });

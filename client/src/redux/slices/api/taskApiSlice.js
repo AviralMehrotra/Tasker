@@ -10,7 +10,7 @@ export const postApiSlice = apiSlice.injectEndpoints({
         body: data,
         credentials: "include",
       }),
-      invalidatesTags: ["Notifications"],
+      invalidatesTags: ["Task", "Notifications"],
     }),
 
     duplicateTask: builder.mutation({
@@ -20,6 +20,7 @@ export const postApiSlice = apiSlice.injectEndpoints({
         body: {},
         credentials: "include",
       }),
+      invalidatesTags: ["Task"],
     }),
 
     updateTask: builder.mutation({
@@ -29,6 +30,7 @@ export const postApiSlice = apiSlice.injectEndpoints({
         body: data,
         credentials: "include",
       }),
+      invalidatesTags: ["Task"],
     }),
 
     getAllTask: builder.query({
@@ -37,6 +39,7 @@ export const postApiSlice = apiSlice.injectEndpoints({
         method: "GET",
         credentials: "include",
       }),
+      providesTags: ["Task"],
     }),
 
     getSingleTask: builder.query({
@@ -45,6 +48,7 @@ export const postApiSlice = apiSlice.injectEndpoints({
         method: "GET",
         credentials: "include",
       }),
+      providesTags: ["Task"],
     }),
 
     createSubTask: builder.mutation({
@@ -54,6 +58,7 @@ export const postApiSlice = apiSlice.injectEndpoints({
         body: data,
         credentials: "include",
       }),
+      invalidatesTags: ["Task"],
     }),
 
     postTaskActivity: builder.mutation({
@@ -63,6 +68,7 @@ export const postApiSlice = apiSlice.injectEndpoints({
         body: data,
         credentials: "include",
       }),
+      invalidatesTags: ["Task"],
     }),
 
     trashTask: builder.mutation({
@@ -71,6 +77,7 @@ export const postApiSlice = apiSlice.injectEndpoints({
         method: "PUT",
         credentials: "include",
       }),
+      invalidatesTags: ["Task"],
     }),
 
     deleteRestoreTask: builder.mutation({
@@ -79,6 +86,7 @@ export const postApiSlice = apiSlice.injectEndpoints({
         method: "DELETE",
         credentials: "include",
       }),
+      invalidatesTags: ["Task"],
     }),
 
     getDasboardStats: builder.query({
@@ -87,6 +95,7 @@ export const postApiSlice = apiSlice.injectEndpoints({
         method: "GET",
         credentials: "include",
       }),
+      providesTags: ["Task"],
     }),
 
     changeTaskStage: builder.mutation({
@@ -96,6 +105,7 @@ export const postApiSlice = apiSlice.injectEndpoints({
         body: data,
         credentials: "include",
       }),
+      invalidatesTags: ["Task"],
     }),
 
     changeSubTaskStatus: builder.mutation({
@@ -105,6 +115,7 @@ export const postApiSlice = apiSlice.injectEndpoints({
         body: data,
         credentials: "include",
       }),
+      invalidatesTags: ["Task"],
     }),
   }),
 });

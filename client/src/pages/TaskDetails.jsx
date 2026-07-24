@@ -90,9 +90,11 @@ const TaskDetails = () => {
   const task = data?.task || [];
 
   if (isLoading)
-    <div className="py-10">
-      <Loading />
-    </div>;
+    return (
+      <div className="py-10">
+        <Loading />
+      </div>
+    );
 
   return (
     <div className="w-full flex flex-col gap-3 mb-4 overflow-y-hidden">
@@ -120,7 +122,7 @@ const TaskDetails = () => {
                     <div
                       className={clsx(
                         "w-4 h-4 rounded-full",
-                        TASK_TYPE[task.stage]
+                        TASK_TYPE[task?.stage]
                       )}
                     />
                     <span className="text-black">{task?.stage}</span>

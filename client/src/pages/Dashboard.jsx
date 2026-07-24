@@ -221,10 +221,10 @@ const Dashboard = () => {
       <div className="w-full flex flex-col md:flex-row gap-4 2xl:gap-10 py-8">
         {/* left */}
 
-        <TaskTable tasks={data.last10Task} />
+        <TaskTable tasks={data?.last10Task || []} />
 
         {/* right */}
-        <UserTable users={data.users} />
+        <UserTable users={data?.users || []} />
       </div>
     </div>
   );
