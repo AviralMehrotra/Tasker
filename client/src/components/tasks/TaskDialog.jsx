@@ -84,7 +84,7 @@ const TaskDialog = ({ task }) => {
                 actionType: "restore",
               }).unwrap();
               toast.success("Task restored successfully");
-            } catch (restoreErr) {
+            } catch {
               toast.error("Failed to restore task");
             }
           },

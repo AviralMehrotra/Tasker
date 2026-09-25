@@ -1,6 +1,6 @@
 import { DialogTitle } from "@headlessui/react";
 import clsx from "clsx";
-import { AlertTriangle, RotateCcw, Trash2, HelpCircle } from "lucide-react";
+import { RotateCcw, Trash2, HelpCircle } from "lucide-react";
 import ModelWrapper from "./ModelWrapper";
 import Button from "./Button";
 

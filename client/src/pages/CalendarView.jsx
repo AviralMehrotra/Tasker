@@ -5,13 +5,8 @@ import {
   Calendar as CalendarIcon,
   AlertTriangle,
   Clock,
-  CheckCircle2,
   CalendarDays,
   Plus,
-  ArrowUpRight,
-  User,
-  Paperclip,
-  CheckSquare,
 } from "lucide-react";
 import { useGetAllTaskQuery } from "../redux/slices/api/taskApiSlice";
 import Loading from "../components/Loader";

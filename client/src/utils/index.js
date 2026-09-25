@@ -32,21 +32,3 @@ export function getInitials(fullName) {
   return initials.join("") || "U";
 }
 
-export const PriorityColors = {
-  high: "text-red-500",
-  medium: "text-yellow-500",
-  normal: "text-blue-500",
-};
-
-export const TASK_TYPE = {
-  todo: "bg-blue-500",
-  "in progress": "bg-yellow-500",
-  completed: "bg-green-500",
-};
-
-export const BGS = [
-  "bg-blue-500",
-  "bg-yellow-500",
-  "bg-red-500",
-  "bg-green-500",
-];

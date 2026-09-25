@@ -13,7 +13,6 @@ import {
   UserCheck,
   Paperclip,
   ArrowUpDown,
-  Filter,
 } from "lucide-react";
 import Loading from "../components/Loader";
 import BoardView from "../components/BoardView";
@@ -277,7 +276,7 @@ const Tasks = () => {
           <div className="flex items-center gap-2">
             <Search className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             <span>
-              Showing search results matching: <strong>"{searchQuery}"</strong>
+              Showing search results matching: <strong>&ldquo;{searchQuery}&rdquo;</strong>
             </span>
           </div>
           <button

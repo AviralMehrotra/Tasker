@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle } from "@headlessui/react";
+import { DialogTitle } from "@headlessui/react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -54,7 +54,7 @@ const AddUser = ({ open, setOpen, userData }) => {
           dispatch(setCredentials({ ...user, ...res?.user }));
         }
       } else {
-        const res = await addNewUser({
+        await addNewUser({
           ...data,
           password: data?.email,
         }).unwrap();

@@ -11,7 +11,6 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
-import { formatDate } from "../utils";
 import UserInfo from "./UserInfo";
 import ConfirmationDialog from "./ConfirmationDialog";
 import {

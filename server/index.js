@@ -8,7 +8,6 @@ import mongoose from "mongoose";
 import morgan from "morgan";
 import dbConnection from "./utils/index.js";
 import { errorHandler, routeNotFound } from "./middlewares/errorMiddleware.js";
-import { protectRoute, isAdminRoute } from "./middlewares/authMiddleware.js";
 import sanitizeNoSql from "./middlewares/sanitizeMiddleware.js";
 import routes from "./routes/index.js";
 
@@ -106,17 +105,6 @@ app.get("/api/health", (req, res) => {
 
 app.get("/healthz", (req, res) => {
   res.status(200).send("ok");
-});
-
-// Guarded internal debug endpoint
-app.get("/debug/notices", protectRoute, isAdminRoute, async (req, res) => {
-  try {
-    const Notice = (await import("./models/notice.js")).default;
-    const all = await Notice.find({}).populate("task", "title").lean();
-    res.json({ count: all.length, notices: all });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
 });
 
 app.get("/", (req, res) => {

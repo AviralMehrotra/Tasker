@@ -9,7 +9,6 @@ import {
 import { toast } from "sonner";
 import clsx from "clsx";
 import { CircleDot, Clock, CheckCircle2, Plus, X } from "lucide-react";
-import AddTask from "./tasks/AddTask";
 
 const COLUMNS = [
   {
@@ -43,9 +42,6 @@ const BoardView = ({ tasks = [] }) => {
     "in progress": [],
     completed: [],
   });
-
-  const [openCreate, setOpenCreate] = useState(false);
-  const [createStage, setCreateStage] = useState("todo");
 
   // Inline Quick-Add states
   const [addingColumnId, setAddingColumnId] = useState(null);
@@ -123,14 +119,14 @@ const BoardView = ({ tasks = [] }) => {
                   stage: sourceColumnId,
                 }).unwrap();
                 toast.success(`Reverted back to ${sourceColumnId.toUpperCase()}`);
-              } catch (revertErr) {
+              } catch {
                 toast.error("Failed to undo stage transition");
               }
             },
           },
           duration: 4500,
         });
-      } catch (error) {
+      } catch {
         toast.error("Failed to update task stage on server");
         // Revert to original
         setColumnsData((prev) => {
@@ -146,11 +142,6 @@ const BoardView = ({ tasks = [] }) => {
         });
       }
     }
-  };
-
-  const handleQuickAdd = (columnId) => {
-    setCreateStage(columnId);
-    setOpenCreate(true);
   };
 
   const handleInlineSubmit = async (columnId) => {
@@ -337,12 +328,6 @@ const BoardView = ({ tasks = [] }) => {
           })}
         </div>
       </DragDropContext>
-
-      <AddTask
-        open={openCreate}
-        setOpen={setOpenCreate}
-        task={{ stage: createStage }}
-      />
     </div>
   );
 };

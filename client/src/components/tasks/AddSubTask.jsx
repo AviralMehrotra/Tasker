@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle } from "@headlessui/react";
+import { DialogTitle } from "@headlessui/react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";

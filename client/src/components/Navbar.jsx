@@ -1,32 +1,13 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setOpenSidebar } from "../redux/slices/authSlice";
-import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import UserAvatar from "./UserAvatar";
 import NotificationPanel from "./NotificationPanel";
 import { useTheme } from "../utils/ThemeContext";
 import { Search, Sun, Moon, Menu } from "lucide-react";
 
 const Navbar = ({ onOpenCommandPalette }) => {
-  const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [searchParams] = useSearchParams();
   const { isDark, toggleTheme } = useTheme();
-
-  const [searchTerm, setSearchTerm] = useState(
-    searchParams.get("search") || ""
-  );
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (searchTerm.trim()) {
-      navigate(`/tasks?search=${encodeURIComponent(searchTerm.trim())}`);
-    } else if (location.pathname === "/tasks") {
-      navigate("/tasks");
-    }
-  };
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between px-4 sm:px-8 py-3 bg-white/90 dark:bg-[#08090d]/90 backdrop-blur-md border-b border-slate-200 dark:border-[#1d202d] transition-colors duration-200">

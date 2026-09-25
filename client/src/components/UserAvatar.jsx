@@ -6,7 +6,7 @@ import {
   Transition,
 } from "@headlessui/react";
 import React, { Fragment, useState } from "react";
-import { User, LogOut, ChevronDown, ShieldCheck } from "lucide-react";
+import { User, LogOut, ChevronDown } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getInitials } from "../utils";

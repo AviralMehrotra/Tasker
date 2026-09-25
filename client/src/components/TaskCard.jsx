@@ -6,8 +6,6 @@ import {
   MessageSquare,
   Paperclip,
   CheckSquare,
-  Calendar,
-  AlertCircle,
   Plus,
 } from "lucide-react";
 import UserInfo from "./UserInfo";
@@ -16,7 +14,6 @@ import AddSubTask from "./tasks/AddSubTask";
 import DueDateBadge from "./DueDateBadge";
 import { useChangeSubTaskStatusMutation } from "../redux/slices/api/taskApiSlice";
 import { toast } from "sonner";
-import { formatDate } from "../utils";
 
 const PriorityBadge = ({ priority }) => {
   const styles = {

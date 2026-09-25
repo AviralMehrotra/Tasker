@@ -4,19 +4,16 @@ import clsx from "clsx";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import {
-  Layers,
   CheckCircle2,
   Clock,
   CircleDot,
   Plus,
   ArrowUpRight,
   TrendingUp,
-  Calendar,
   PieChart as PieIcon,
   Activity,
 } from "lucide-react";
 import Chart from "../components/Chart";
-import UserInfo from "../components/UserInfo";
 import Loading from "../components/Loader";
 import AddTask from "../components/tasks/AddTask";
 import { useGetDasboardStatsQuery } from "../redux/slices/api/taskApiSlice";

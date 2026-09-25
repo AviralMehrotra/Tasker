@@ -8,13 +8,12 @@ import {
   Transition,
 } from "@headlessui/react";
 import { BsChevronExpand } from "react-icons/bs";
-import clsx from "clsx";
 import { getInitials } from "../../utils";
 import { MdCheck } from "react-icons/md";
 import { useGetTeamListsQuery } from "../../redux/slices/api/userApiSlice";
 
 const UserList = ({ setTeam, team }) => {
-  const { data, isLoading } = useGetTeamListsQuery();
+  const { data } = useGetTeamListsQuery();
   const [selectedUsers, setSelectedUsers] = useState([]);
   const handleChange = (el) => {
     setSelectedUsers(el);

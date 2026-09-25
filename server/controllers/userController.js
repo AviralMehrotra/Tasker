@@ -187,16 +187,6 @@ export const markNotificationRead = async (req, res) => {
 export const changeUserPassword = async (req, res) => {
   try {
     const { userId } = req.user;
-
-    // Remove this condition
-    // if (userId === "65ff94c7bb2de638d0c73f63") {
-    //   return res.status(404).json({
-    //     status: false,
-    //     message:
-    //       "This is a test user. You can not chnage password. Thank you!!!",
-    //   });
-    // }
-
     const user = await User.findById(userId);
 
     if (user) {
@@ -262,11 +252,3 @@ export const deleteUserProfile = async (req, res) => {
   }
 };
 
-// export const name = async (req, res) => {
-//   try {
-
-//   } catch (error) {
-//     console.log(error);
-//     res.status(400).json({ status: false, message: error.message });
-//   }
-// }

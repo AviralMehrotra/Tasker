@@ -18,15 +18,10 @@ import {
   Lock,
   Eye,
   EyeOff,
-  Check,
-  Mail,
-  Briefcase,
-  KeyRound,
   Sun,
   Moon,
   Copy,
   LogOut,
-  Sparkles,
   Camera,
   Upload,
   Trash2,
@@ -279,7 +274,7 @@ export const ProfileModal = ({ open, setOpen, initialTab = "profile" }) => {
       toast.success("Logged out successfully");
       setOpen(false);
       window.location.href = "/login";
-    } catch (err) {
+    } catch {
       dispatch(logout());
       setOpen(false);
       window.location.href = "/login";

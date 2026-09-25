@@ -7,7 +7,6 @@ import { setCredentials } from "../redux/slices/authSlice.js";
 import { toast } from "sonner";
 import { useTheme } from "../utils/ThemeContext.jsx";
 import {
-  Layers,
   Eye,
   EyeOff,
   Sun,

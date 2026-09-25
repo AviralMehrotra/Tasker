@@ -177,7 +177,7 @@ const MyTasks = () => {
           <div className="flex items-center gap-2">
             <Search className="w-4 h-4 text-blue-500" />
             <span>
-              Query Filter: <strong className="font-bold font-mono">"{searchQuery}"</strong>
+              Query Filter: <strong className="font-bold font-mono">&ldquo;{searchQuery}&rdquo;</strong>
             </span>
           </div>
           <button

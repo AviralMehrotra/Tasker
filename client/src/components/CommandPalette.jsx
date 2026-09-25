@@ -17,8 +17,6 @@ import {
   FileSpreadsheet,
   FileCode,
   Share2,
-  ArrowRight,
-  Command,
   CornerDownLeft,
   X,
   Keyboard,
@@ -438,7 +436,7 @@ export const CommandPalette = ({ isOpen, setIsOpen }) => {
             <div className="max-h-[380px] overflow-y-auto p-2 divide-y divide-slate-100 dark:divide-[#151824] scrollbar-none">
               {filteredItems.length === 0 ? (
                 <div className="py-10 text-center text-xs text-slate-400 dark:text-slate-500">
-                  No matching commands or tasks found for "{query}".
+                  No matching commands or tasks found for &ldquo;{query}&rdquo;.
                 </div>
               ) : (
                 <div className="space-y-0.5">
