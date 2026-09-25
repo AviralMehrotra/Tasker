@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTheme } from "../utils/ThemeContext.jsx";
+import Lenis from "lenis";
 import {
   ArrowRight,
   ShieldCheck,
@@ -17,8 +18,9 @@ import {
   CheckSquare,
   Menu,
   X,
-  Play,
   Columns3,
+  Lock,
+  KeyRound,
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -29,6 +31,50 @@ export default function LandingPage() {
   const [activeWorkflowTab, setActiveWorkflowTab] = useState("sprint");
   const [demoFilter, setDemoFilter] = useState("all");
   const [copiedShortcut, setCopiedShortcut] = useState(false);
+
+  const lenisRef = useRef(null);
+
+  // Initialize buttery-smooth Lenis inertia scrolling
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: "vertical",
+      gestureOrientation: "vertical",
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 1.5,
+    });
+    lenisRef.current = lenis;
+
+    let rafId;
+    function raf(time) {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    }
+    rafId = requestAnimationFrame(raf);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+    };
+  }, []);
+
+  const scrollToSection = (e, sectionId) => {
+    e.preventDefault();
+    setMobileMenuOpen(false);
+    const target = document.getElementById(sectionId);
+    if (target) {
+      // Find the header container (eyebrow + title) to frame the section content with exact precision
+      const contentTarget = target.querySelector(".max-w-2xl") || target;
+      if (lenisRef.current) {
+        // Sticky navbar is 64px tall (h-16). Offset of -84px places the eyebrow exactly 20px below the navbar
+        lenisRef.current.scrollTo(contentTarget, { offset: -84, duration: 1.0 });
+      } else {
+        contentTarget.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  };
 
   // Interactive Live Kanban tasks state for visitor playground
   const [interactiveTasks, setInteractiveTasks] = useState([
@@ -144,31 +190,29 @@ export default function LandingPage() {
           <nav className="hidden md:flex items-center gap-7 text-xs font-semibold text-slate-600 dark:text-slate-300">
             <a
               href="#features"
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              onClick={(e) => scrollToSection(e, "features")}
+              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
             >
               Capabilities
             </a>
             <a
-              href="#interactive-board"
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              Live Demo
-            </a>
-            <a
               href="#workflow"
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              onClick={(e) => scrollToSection(e, "workflow")}
+              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
             >
               Workflow
             </a>
             <a
               href="#comparison"
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              onClick={(e) => scrollToSection(e, "comparison")}
+              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
             >
               Architecture vs Legacy
             </a>
             <a
               href="#security"
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              onClick={(e) => scrollToSection(e, "security")}
+              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
             >
               Security
             </a>
@@ -232,36 +276,29 @@ export default function LandingPage() {
           <div className="md:hidden border-b border-slate-200 dark:border-[#1d202d] bg-white dark:bg-[#0c0e15] px-4 py-4 space-y-3">
             <a
               href="#features"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+              onClick={(e) => scrollToSection(e, "features")}
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer"
             >
               Capabilities
             </a>
             <a
-              href="#interactive-board"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-sm font-medium text-slate-700 dark:text-slate-300"
-            >
-              Live Demo
-            </a>
-            <a
               href="#workflow"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+              onClick={(e) => scrollToSection(e, "workflow")}
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer"
             >
               Workflow
             </a>
             <a
               href="#comparison"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+              onClick={(e) => scrollToSection(e, "comparison")}
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer"
             >
               Architecture vs Legacy
             </a>
             <a
               href="#security"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+              onClick={(e) => scrollToSection(e, "security")}
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer"
             >
               Security
             </a>
@@ -312,7 +349,7 @@ export default function LandingPage() {
                 coordinate releases, and eliminate ceremonial drag.
               </p>
 
-              {/* Action Buttons & Quick Demo Access */}
+              {/* Action Buttons */}
               <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <Link
                   to={user ? "/dashboard" : "/login"}
@@ -323,11 +360,11 @@ export default function LandingPage() {
                 </Link>
 
                 <a
-                  href="#interactive-board"
+                  href="#features"
+                  onClick={(e) => scrollToSection(e, "features")}
                   className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white dark:bg-[#10121a] hover:bg-slate-50 dark:hover:bg-[#161925] border border-slate-200 dark:border-[#1d202d] text-slate-800 dark:text-slate-200 font-semibold text-sm transition-colors cursor-pointer"
                 >
-                  <Play className="w-3.5 h-3.5 text-blue-500 fill-blue-500" />
-                  <span>Try Interactive Board</span>
+                  <span>Explore Capabilities</span>
                 </a>
               </div>
 
@@ -357,8 +394,8 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Right Column: Live Interactive Product Board Simulation */}
-            <div className="lg:col-span-6" id="interactive-board">
+            {/* Right Column: Live Workspace Preview */}
+            <div className="lg:col-span-6">
               <div className="rounded-2xl bg-white dark:bg-[#0e1017] border border-slate-200 dark:border-[#1d202d] shadow-xl overflow-hidden transition-all">
                 {/* Board Mockup Window Bar */}
                 <div className="px-4 py-3 bg-slate-50 dark:bg-[#12141f] border-b border-slate-200 dark:border-[#1d202d] flex items-center justify-between">
@@ -367,13 +404,13 @@ export default function LandingPage() {
                     <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
                     <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
                     <span className="ml-2 font-mono text-[11px] text-slate-500 dark:text-slate-400">
-                      sprint-v2.0 // live-sandbox
+                      tasker-workspace // active-sprint
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-[10px] uppercase font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 px-2 py-0.5 rounded">
-                      Live Sync Active
+                      Stage Sync Active
                     </span>
                   </div>
                 </div>
@@ -386,7 +423,7 @@ export default function LandingPage() {
                         Sprint Execution Board
                       </h3>
                       <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Click any checkbox below to experience zero-latency state toggle
+                        Interactive task matrix with optimistic stage updates
                       </p>
                     </div>
 
@@ -509,13 +546,13 @@ export default function LandingPage() {
                 <div className="px-4 py-2.5 bg-slate-50 dark:bg-[#12141f] border-t border-slate-200 dark:border-[#1d202d] flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400">
                   <span className="flex items-center gap-1.5">
                     <Sliders className="w-3.5 h-3.5 text-blue-500" />
-                    Interactive Simulator
+                    Sprint Telemetry Online
                   </span>
                   <Link
                     to="/login"
                     className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 font-semibold"
                   >
-                    <span>Log in to create tasks</span>
+                    <span>Sign in to customize board</span>
                     <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
@@ -1104,6 +1141,76 @@ export default function LandingPage() {
       </section>
 
       {/* =========================================================================
+          7. ENTERPRISE SECURITY & DATA GOVERNANCE (#security)
+      ========================================================================= */}
+      <section
+        id="security"
+        className="py-20 lg:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-200/70 dark:border-[#1d202d]"
+      >
+        <div className="space-y-4 max-w-2xl mb-14">
+          <p className="font-mono text-xs uppercase tracking-widest text-blue-600 dark:text-blue-400 font-semibold">
+            Enterprise Security & Governance
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            Engineered for strict organizational compliance.
+          </h2>
+          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
+            Every route and mutation is cryptographically validated, role-scoped, and protected against data leaks.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-[#0f1118] border border-slate-200 dark:border-[#1d202d] space-y-4">
+            <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              Role-Based Access Control (RBAC)
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              Deterministic privilege scoping strictly isolates Workspace Administrators from Team Members. User provisioning, team deactivations, and soft-delete purges require verified admin claims.
+            </p>
+            <div className="pt-2 font-mono text-[11px] text-blue-600 dark:text-blue-400 flex items-center gap-1.5 font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+              <span>Verified Claims Guard</span>
+            </div>
+          </div>
+
+          <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-[#0f1118] border border-slate-200 dark:border-[#1d202d] space-y-4">
+            <div className="w-10 h-10 rounded-xl bg-emerald-600/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+              <Lock className="w-5 h-5" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              httpOnly Cookie Token Isolation
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              Session tokens are delivered via stateless httpOnly cookies. With zero token exposure in browser localStorage, client-side scripts are structurally isolated against XSS theft.
+            </p>
+            <div className="pt-2 font-mono text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span>Zero localStorage Leaks</span>
+            </div>
+          </div>
+
+          <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-[#0f1118] border border-slate-200 dark:border-[#1d202d] space-y-4">
+            <div className="w-10 h-10 rounded-xl bg-amber-600/10 border border-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
+              <KeyRound className="w-5 h-5" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              Soft Deletion & Audit Recovery
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              Tasker prevents accidental project data loss with two-phase deletion. Tasks move to an isolated trash holding area and can be restored with full subtask hierarchies intact.
+            </p>
+            <div className="pt-2 font-mono text-[11px] text-amber-600 dark:text-amber-400 flex items-center gap-1.5 font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+              <span>Full Lifecycle Recovery</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
           7. NUMERIC PERFORMANCE TELEMETRY BAR
       ========================================================================= */}
       <section className="py-14 border-t border-b border-slate-200/70 dark:border-[#1d202d] bg-white dark:bg-[#0a0c12]">
@@ -1165,7 +1272,7 @@ export default function LandingPage() {
 
             <p className="text-base sm:text-lg text-slate-400 leading-relaxed max-w-xl">
               Experience the clarity of zero-drag project orchestration. Set up your workspace in
-              seconds or sign in with our preconfigured demo accounts.
+              seconds or sign in with your team credentials.
             </p>
 
             <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
@@ -1192,7 +1299,6 @@ export default function LandingPage() {
           9. ENGINEERING-GRADE FOOTER
       ========================================================================= */}
       <footer
-        id="security"
         className="border-t border-slate-200 dark:border-[#1d202d] bg-white dark:bg-[#06070a] pt-14 pb-10 transition-colors"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
