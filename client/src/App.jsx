@@ -1,3 +1,4 @@
+import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Tasks from "./pages/Tasks";
@@ -96,8 +97,8 @@ function App() {
   return (
     <main className="w-full min-h-screen bg-[#fbfbfa] dark:bg-[#08090d] text-slate-900 dark:text-[#f4f4f6] transition-colors duration-200">
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route element={<Layout />}>
-          <Route index path="/" element={<Navigate to="/dashboard" />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/my-tasks" element={<MyTasks />} />
