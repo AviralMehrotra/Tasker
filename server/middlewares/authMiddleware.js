@@ -3,7 +3,12 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 
 const protectRoute = async (req, res, next) => {
-  let token = req.cookies.token;
+  let token = req.cookies?.token;
+
+  if (!token && req.headers?.authorization?.startsWith("Bearer ")) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+
   if (token) {
     try {
       const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
@@ -12,10 +17,16 @@ const protectRoute = async (req, res, next) => {
         "isAdmin email"
       );
 
+      if (!resp) {
+        return res
+          .status(401)
+          .json({ status: false, message: "User not found. Try login again." });
+      }
+
       req.user = {
         email: resp.email,
         isAdmin: resp.isAdmin,
-        userId: new mongoose.Types.ObjectId(decodedToken.userId),
+        userId: resp._id,
       };
 
       next();

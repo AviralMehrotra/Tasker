@@ -7,24 +7,28 @@ const TextBox = React.forwardRef(
     ref
   ) => {
     return (
-      <div className="w-full flex flex-col gap-1">
+      <div className="w-full flex flex-col gap-1.5">
         {label && (
-          <span
+          <label
             htmlFor={name}
-            className={clsx("text-slate-900 dark:text-gray-700", labelClass)}
+            className={clsx(
+              "text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300",
+              labelClass
+            )}
           >
             {label}
-          </span>
+          </label>
         )}
 
         <div>
           <input
             type={type || "text"}
             name={name}
+            id={name}
             placeholder={placeholder}
             ref={ref}
             className={clsx(
-              "bg-transparent px-3 py-2.5 2xl:py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-300 dark:placeholder-gray-500 text-gray-900 outline-none text-base focus:ring-2 ring-blue-300",
+              "w-full bg-slate-50 dark:bg-[#12151f] px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-[#1e2333] text-slate-900 dark:text-[#f4f4f6] placeholder-slate-400 dark:placeholder-slate-500 outline-none text-xs sm:text-sm transition-colors focus:border-blue-500 focus:bg-white dark:focus:bg-[#10121a] focus:ring-1 focus:ring-blue-500",
               className
             )}
             {...register}
@@ -32,7 +36,7 @@ const TextBox = React.forwardRef(
           />
         </div>
         {error && (
-          <span className="text-xs text-[#f64949fe] mt-0.5 ">{error}</span>
+          <span className="text-xs text-rose-500 font-medium mt-0.5">{error}</span>
         )}
       </div>
     );

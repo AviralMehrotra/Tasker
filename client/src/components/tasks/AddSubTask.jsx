@@ -31,76 +31,78 @@ const AddSubTask = ({ open, setOpen, id }) => {
   };
 
   return (
-    <>
-      <ModelWrapper open={open} setOpen={setOpen}>
-        <form onSubmit={handleSubmit(handleOnSubmit)} className="">
+    <ModelWrapper open={open} setOpen={setOpen}>
+      <form onSubmit={handleSubmit(handleOnSubmit)} className="space-y-5">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
           <DialogTitle
-            as="h2"
-            className="text-base font-bold leading-6 text-gray-900 mb-4"
+            as="h3"
+            className="text-lg font-bold text-slate-900 dark:text-white"
           >
-            Add Subtasks
+            Add Checklist Subtask
           </DialogTitle>
-          <div className="mt-2 flex flex-col gap-6">
+          <span className="text-xs text-slate-400 font-medium">
+            Break tasks down into manageable steps
+          </span>
+        </div>
+
+        <div className="space-y-4">
+          <TextBox
+            placeholder="e.g. Design responsive wireframes"
+            type="text"
+            name="title"
+            label="Subtask Title"
+            register={register("title", {
+              required: "Title is required!",
+            })}
+            error={errors.title ? errors.title.message : ""}
+          />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <TextBox
-              placeholder="Sub-Task title"
-              type="text"
-              name="title"
-              label="Title"
-              className="w-full rounded"
-              register={register("title", {
-                required: "Title is required!",
+              placeholder="Date"
+              type="date"
+              name="date"
+              label="Target Date"
+              register={register("date", {
+                required: "Date is required!",
               })}
-              error={errors.title ? errors.title.message : ""}
+              error={errors.date ? errors.date.message : ""}
+            />
+            <TextBox
+              placeholder="e.g. Design, Frontend, Review"
+              type="text"
+              name="tag"
+              label="Tag / Category"
+              register={register("tag", {
+                required: "Tag is required!",
+              })}
+              error={errors.tag ? errors.tag.message : ""}
+            />
+          </div>
+        </div>
+
+        {isLoading ? (
+          <div className="py-3 flex justify-center items-center">
+            <Loading />
+          </div>
+        ) : (
+          <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row-reverse gap-3">
+            <Button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl px-6 py-2.5 shadow-sm shadow-blue-500/20 transition-all justify-center"
+              label="Add Subtask"
             />
 
-            <div className="flex items-center gap-4">
-              <TextBox
-                placeholder="Date"
-                type="date"
-                name="date"
-                label="Task Date"
-                className="w-full rounded"
-                register={register("date", {
-                  required: "Date is required!",
-                })}
-                error={errors.date ? errors.date.message : ""}
-              />
-              <TextBox
-                placeholder="Tag"
-                type="text"
-                name="tag"
-                label="Tag"
-                className="w-full rounded"
-                register={register("tag", {
-                  required: "Tag is required!",
-                })}
-                error={errors.tag ? errors.tag.message : ""}
-              />
-            </div>
+            <Button
+              type="button"
+              className="px-6 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl transition-all justify-center"
+              onClick={() => setOpen(false)}
+              label="Cancel"
+            />
           </div>
-          {isLoading ? (
-            <div className="mt-8">
-              <Loading />
-            </div>
-          ) : (
-            <div className="py-3 mt-4 flex sm:flex-row-reverse gap-4">
-              <Button
-                type="submit"
-                className="bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 sm:ml-3 sm:w-auto rounded"
-                label="Add Task"
-              />
-
-              <Button
-                type="button"
-                className="bg-white border text-sm font-semibold text-gray-900 sm:w-auto rounded"
-                onClick={() => setOpen(false)}
-                label="Cancel"
-              />
-            </div>
-          )}
-        </form>
-      </ModelWrapper>
-    </>
+        )}
+      </form>
+    </ModelWrapper>
   );
 };
 

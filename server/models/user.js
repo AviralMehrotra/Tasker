@@ -11,13 +11,14 @@ const userSchema = new Schema(
     isAdmin: { type: Boolean, required: true, default: false },
     tasks: [{ type: Schema.Types.ObjectId, ref: "Task" }],
     isActive: { type: Boolean, required: true, default: true },
+    avatar: { type: String, default: "" },
   },
   { timestamps: true }
 );
 
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
   if (!this.isModified("password")) {
-    next();
+    return;
   }
 
   const salt = await bcrypt.genSalt(10);

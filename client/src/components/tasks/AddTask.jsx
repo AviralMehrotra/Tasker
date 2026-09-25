@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ModelWrapper from "../ModelWrapper";
 import { DialogTitle } from "@headlessui/react";
 import { useForm } from "react-hook-form";
@@ -18,57 +18,44 @@ import { toast } from "sonner";
 const Lists = ["ToDo", "In Progress", "Completed"];
 const Priority = ["High", "Medium", "Normal", "Low"];
 
-const uploadedFileURLs = [];
-
 const uploadFile = async (file) => {
-  const url = import.meta.env.CLOUDINARY_URL;
-  const preset = import.meta.env.CLOUDINARY_PRESET;
+  const url =
+    import.meta.env.VITE_CLOUDINARY_URL || import.meta.env.CLOUDINARY_URL;
+  const preset =
+    import.meta.env.VITE_CLOUDINARY_PRESET || import.meta.env.CLOUDINARY_PRESET;
+
+  if (!url || !preset) {
+    throw new Error(
+      "Cloudinary upload configuration missing. Please verify VITE_CLOUDINARY_URL."
+    );
+  }
 
   const formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", preset);
 
-  return fetch(url, {
+  const res = await fetch(url, {
     method: "POST",
     body: formData,
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.secure_url) {
-        uploadedFileURLs.push(data.secure_url);
-      } else {
-        throw new Error("Upload failed");
-      }
-    });
+  });
+  const data = await res.json();
+  if (data.secure_url) {
+    return data.secure_url;
+  }
+  throw new Error(data?.error?.message || "File upload failed");
 };
 
 const AddTask = ({ open, setOpen, task }) => {
-  String.prototype.capitalize = function () {
-    return this.charAt(0).toUpperCase() + this.slice(1);
-  };
-
-  const defaultValues = {
-    title: task?.title || "",
-    date: dateFormatter(task?.date || new Date()),
-    team: [],
-    stage: "",
-    priority: "",
-    assets: [],
-    description: "",
-    links: "",
-  };
-
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
-  } = useForm({ defaultValues });
+  } = useForm();
 
-  const [team, setTeam] = useState(task?.team || []);
-  const [stage, setStage] = useState(task?.stage?.toUpperCase() || Lists[0]);
-  const [priority, setPriority] = useState(
-    task?.priority?.toUpperCase() || Priority[2]
-  );
+  const [team, setTeam] = useState([]);
+  const [stage, setStage] = useState(Lists[0]);
+  const [priority, setPriority] = useState(Priority[2]);
 
   const [assets, setAssets] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -76,15 +63,47 @@ const AddTask = ({ open, setOpen, task }) => {
   const [createTask, { isLoading }] = useCreateTaskMutation();
   const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
 
+  useEffect(() => {
+    if (task) {
+      reset({
+        title: task?.title || "",
+        date: dateFormatter(task?.date || new Date()),
+        description: task?.description || "",
+        links: Array.isArray(task?.links)
+          ? task.links.join(", ")
+          : task?.links || "",
+      });
+      setTeam(task?.team || []);
+      setStage(task?.stage ? task.stage.toUpperCase() : Lists[0]);
+      setPriority(task?.priority ? task.priority.toUpperCase() : Priority[2]);
+    } else {
+      reset({
+        title: "",
+        date: dateFormatter(new Date()),
+        description: "",
+        links: "",
+      });
+      setTeam([]);
+      setStage(Lists[0]);
+      setPriority(Priority[2]);
+    }
+    setAssets([]);
+  }, [task, open, reset]);
+
   const URLS = task?.assets ? [...task.assets] : [];
 
   const submitHandler = async (data) => {
-    for (const file of assets) {
+    const uploadedUrls = [];
+    if (assets && assets.length > 0) {
       setUploading(true);
       try {
-        await uploadFile(file);
+        for (const file of Array.from(assets)) {
+          const secureUrl = await uploadFile(file);
+          if (secureUrl) uploadedUrls.push(secureUrl);
+        }
       } catch (error) {
-        console.error("Error uploading file:", error.message);
+        setUploading(false);
+        toast.error(error.message || "Upload failed");
         return;
       } finally {
         setUploading(false);
@@ -94,24 +113,24 @@ const AddTask = ({ open, setOpen, task }) => {
     try {
       const newData = {
         ...data,
-        assets: [...URLS, ...uploadedFileURLs],
-        team,
-        stage,
-        priority,
+        assets: [...URLS, ...uploadedUrls],
+        team: team.map((u) => (typeof u === "object" ? u._id : u)),
+        stage: stage.toLowerCase(),
+        priority: priority.toLowerCase(),
       };
-      console.log(data, newData);
+
       const res = task?._id
         ? await updateTask({ ...newData, _id: task._id }).unwrap()
         : await createTask(newData).unwrap();
 
-      toast.success(res.message);
+      toast.success(res?.message || "Task saved successfully.");
 
       setTimeout(() => {
         setOpen(false);
       }, 500);
     } catch (err) {
       console.log(err);
-      toast.error(err?.data?.message || err.error);
+      toast.error(err?.data?.message || err.error || "Failed to save task");
     }
   };
 
@@ -120,129 +139,132 @@ const AddTask = ({ open, setOpen, task }) => {
   };
 
   return (
-    <>
-      <ModelWrapper open={open} setOpen={setOpen}>
-        <form onSubmit={handleSubmit(submitHandler)}>
+    <ModelWrapper open={open} setOpen={setOpen}>
+      <form onSubmit={handleSubmit(submitHandler)} className="space-y-5">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
           <DialogTitle
-            as="h2"
-            className="text-base font-bold leading-6 text-gray-900 mb-4"
+            as="h3"
+            className="text-lg font-bold text-slate-900 dark:text-white"
           >
-            {task ? "UPDATE TASK" : "ADD TASK"}
+            {task ? "Edit Task" : "Create New Task"}
           </DialogTitle>
+          <span className="text-xs text-slate-400 font-medium">
+            {task ? "Update existing task details" : "Add a task to your workspace"}
+          </span>
+        </div>
 
-          <div className="mt-2 flex flex-col gap-6">
-            <TextBox
-              placeholder="Task title"
-              type="text"
-              name="title"
-              label="Task Title"
-              className="w-full rounded"
-              register={register("title", {
-                required: "Title is required!",
-              })}
-              error={errors.title ? errors.title.message : ""}
+        <div className="space-y-4 max-h-[65vh] overflow-y-auto pr-1">
+          <TextBox
+            placeholder="e.g. Redesign Landing Page"
+            type="text"
+            name="title"
+            label="Task Title"
+            register={register("title", {
+              required: "Title is required!",
+            })}
+            error={errors.title ? errors.title.message : ""}
+          />
+
+          <UserList setTeam={setTeam} team={team} />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <SelectList
+              label="Stage"
+              lists={Lists}
+              selected={stage}
+              setSelected={setStage}
             />
-            <UserList setTeam={setTeam} team={team} />
-            <div className="flex gap-4">
-              <SelectList
-                label="Task Stage"
-                lists={Lists}
-                selected={stage}
-                setSelected={setStage}
-              />
-              <SelectList
-                label="Priority Level"
-                lists={Priority}
-                selected={priority}
-                setSelected={setPriority}
-              />
-            </div>
-            <div className="flex gap-4">
-              <div className="w-full">
-                <TextBox
-                  placeholder="Date"
-                  type="date"
-                  name="date"
-                  label="Task Date"
-                  className="w-full rounded"
-                  register={register("date", {
-                    required: "Date is required!",
-                  })}
-                  error={errors.date ? errors.date.message : ""}
+            <SelectList
+              label="Priority"
+              lists={Priority}
+              selected={priority}
+              setSelected={setPriority}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <TextBox
+              placeholder="Due Date"
+              type="date"
+              name="date"
+              label="Due Date"
+              register={register("date", {
+                required: "Date is required!",
+              })}
+              error={errors.date ? errors.date.message : ""}
+            />
+
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                Attachments ({assets.length || URLS.length} files)
+              </span>
+              <label
+                className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-500 bg-slate-50/50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 text-xs font-semibold cursor-pointer transition-colors"
+                htmlFor="imgUpload"
+              >
+                <input
+                  type="file"
+                  className="hidden"
+                  id="imgUpload"
+                  onChange={handleSelect}
+                  accept=".jpg, .png, .jpeg"
+                  multiple
                 />
-              </div>
-              <div className="w-full flex items-center justify-center mt-4">
-                <label
-                  className="flex items-center gap-1 text-base text-ascent-2 hover:text-ascent-1 cursor-pointer my-4"
-                  htmlFor="imgUpload"
-                >
-                  <input
-                    type="file"
-                    className="hidden"
-                    id="imgUpload"
-                    onChange={(e) => handleSelect(e)}
-                    accept=".jpg, .png, .jpeg"
-                    multiple={true}
-                  />
-                  <BiImages />
-                  <span>Add Assets</span>
-                </label>
-              </div>
-            </div>
-
-            <div className="w-full">
-              <p>Task Description</p>
-              <textarea
-                name="description"
-                {...register("description")}
-                className="w-full bg-transparent px-3 py-1.5 2xl:py-3 border border-gray-300
-            dark:border-gray-600 placeholder-gray-300 dark:placeholder-gray-700
-            text-gray-900 outline-none text-base focus:ring-2
-            ring-blue-300"
-              ></textarea>
-            </div>
-
-            <div className="w-full">
-              <p>
-                Add Links{" "}
-                <span className="text- text-gray-600">
-                  seperated by comma (,)
-                </span>
-              </p>
-              <textarea
-                name="links"
-                {...register("links")}
-                className="w-full bg-transparent px-3 py-1.5 2xl:py-3 border border-gray-300
-            dark:border-gray-600 placeholder-gray-300 dark:placeholder-gray-700
-            text-gray-900 outline-none text-base focus:ring-2
-            ring-blue-300"
-              ></textarea>
+                <BiImages size={18} className="text-blue-500" />
+                <span>{assets.length > 0 ? `${assets.length} selected` : "Upload Images"}</span>
+              </label>
             </div>
           </div>
 
-          {isLoading || isUpdating || uploading ? (
-            <div className="py-4">
-              <Loading />
-            </div>
-          ) : (
-            <div className="bg-gray-50 mt-6 mb-4 sm:flex sm:flex-row-reverse gap-4">
-              <Button
-                label="Submit"
-                type="submit"
-                className="bg-blue-600 px-8 text-sm font-semibold text-white hover:bg-blue-700  sm:w-auto"
-              />
+          <div className="flex flex-col gap-1.5">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              Task Description
+            </span>
+            <textarea
+              rows={3}
+              name="description"
+              placeholder="Provide context, details, or instructions..."
+              {...register("description")}
+              className="w-full bg-slate-50/50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 outline-none text-sm transition-all focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+            />
+          </div>
 
-              <Button
-                type="button"
-                className="bg-white px-5 text-sm font-semibold text-gray-900 sm:w-auto"
-                onClick={() => setOpen(false)}
-                label="Cancel"
-              />
-            </div>
-          )}
-        </form>
-      </ModelWrapper>
-    </>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              Reference Links <span className="text-slate-400 normal-case">(comma separated)</span>
+            </span>
+            <textarea
+              rows={2}
+              name="links"
+              placeholder="https://figma.com/..., https://github.com/..."
+              {...register("links")}
+              className="w-full bg-slate-50/50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 outline-none text-sm transition-all focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+            />
+          </div>
+        </div>
+
+        {isLoading || isUpdating || uploading ? (
+          <div className="py-3 flex justify-center items-center">
+            <Loading />
+          </div>
+        ) : (
+          <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row-reverse gap-3">
+            <Button
+              label={task ? "Update Task" : "Create Task"}
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl px-6 py-2.5 shadow-sm shadow-blue-500/20 transition-all justify-center"
+            />
+
+            <Button
+              type="button"
+              className="px-6 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl transition-all justify-center"
+              onClick={() => setOpen(false)}
+              label="Cancel"
+            />
+          </div>
+        )}
+      </form>
+    </ModelWrapper>
   );
 };
 

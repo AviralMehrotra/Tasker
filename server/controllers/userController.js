@@ -4,7 +4,7 @@ import { createJWT } from "../utils/index.js";
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, isAdmin, role, title } = req.body;
+    const { name, email, password, isAdmin, role, title, avatar } = req.body;
 
     const userExist = await User.findOne({ email });
 
@@ -22,6 +22,7 @@ export const registerUser = async (req, res) => {
       isAdmin,
       role,
       title,
+      avatar: avatar || "",
     });
 
     if (user) {
@@ -63,9 +64,9 @@ export const loginUser = async (req, res) => {
     const isMatch = await user.matchPassword(password);
 
     if (user && isMatch) {
-      createJWT(res, user._id);
+      const token = createJWT(res, user._id);
       user.password = undefined;
-      res.status(200).json(user);
+      res.status(200).json({ ...user.toObject(), token });
     } else {
       return res
         .status(401)
@@ -94,7 +95,7 @@ export const logoutUser = (req, res) => {
 
 export const getTeamList = async (req, res) => {
   try {
-    const users = await User.find().select("name title role email isActive");
+    const users = await User.find().select("name title role email isActive avatar");
 
     res.status(200).json(users);
   } catch (error) {
@@ -126,12 +127,8 @@ export const updateUserProfile = async (req, res) => {
     const { userId, isAdmin } = req.user;
     const { _id } = req.body;
 
-    const id =
-      isAdmin && userId === _id
-        ? userId
-        : isAdmin && userId !== _id
-        ? _id
-        : userId;
+    const currentUserId = userId.toString();
+    const id = isAdmin && _id ? _id : currentUserId;
 
     const user = await User.findById(id);
 
@@ -140,6 +137,9 @@ export const updateUserProfile = async (req, res) => {
       // user.email = req.body.email || user.email;
       user.title = req.body.title || user.title;
       user.role = req.body.role || user.role;
+      if (req.body.avatar !== undefined) {
+        user.avatar = req.body.avatar;
+      }
 
       const updatedUser = await user.save();
 

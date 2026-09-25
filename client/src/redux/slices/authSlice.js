@@ -1,16 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initalState = {
-  user: localStorage.getItem("userInfo")
-    ? JSON.parse(localStorage.getItem("userInfo"))
-    : null,
+const getUserFromStorage = () => {
+  try {
+    const userInfo = localStorage.getItem("userInfo");
+    return userInfo ? JSON.parse(userInfo) : null;
+  } catch (error) {
+    console.error("Failed to parse userInfo from localStorage", error);
+    localStorage.removeItem("userInfo");
+    return null;
+  }
+};
 
+const initialState = {
+  user: getUserFromStorage(),
   isSidebarOpen: false,
 };
 
 const authSlice = createSlice({
   name: "auth",
-  initialState: initalState,
+  initialState,
   reducers: {
     setCredentials: (state, action) => {
       state.user = action.payload;

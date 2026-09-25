@@ -21,29 +21,43 @@ const UserList = ({ setTeam, team }) => {
     setTeam(el?.map((u) => u._id));
   };
   useEffect(() => {
-    if (team?.length < 1) {
-      data && setSelectedUsers([data[0]]);
+    if (!data) return;
+
+    if (team && team.length > 0) {
+      const matched = team
+        .map((t) => {
+          const id = typeof t === "object" ? t?._id : t;
+          return data.find((u) => u._id === id);
+        })
+        .filter(Boolean);
+      setSelectedUsers(matched);
     } else {
-      setSelectedUsers(team);
+      setSelectedUsers([]);
     }
-  }, [isLoading]);
+  }, [data, team]);
 
   return (
-    <div>
-      <p className="text-gray-700">Assign Users:</p>
+    <div className="w-full flex flex-col gap-1.5">
+      <span className="text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+        Assign Members:
+      </span>
       <Listbox
         value={selectedUsers}
         onChange={(el) => handleChange(el)}
         multiple
       >
-        <div className="relative mt-1">
-          <ListboxButton className="relative w-full cursor-default rounded bg-white pl-3 pr-10 text-left px-3 py-2.5 2xl:py-3 border border-gray-300 dark:border-gray-600 sm:text-sm">
-            <span className="block truncate">
-              {selectedUsers?.map((user) => user.name).join(", ")}
-            </span>
-            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+        <div className="relative">
+          <ListboxButton className="relative w-full cursor-default rounded-xl bg-slate-50/50 dark:bg-slate-800/60 pl-3.5 pr-10 text-left py-2.5 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all min-h-[42px]">
+            {selectedUsers.length === 0 ? (
+              <span className="text-slate-400 dark:text-slate-500 text-sm">Select team members...</span>
+            ) : (
+              <span className="block truncate font-medium text-slate-900 dark:text-slate-100">
+                {selectedUsers?.map((user) => user.name).join(", ")}
+              </span>
+            )}
+            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
               <BsChevronExpand
-                className="h-5 w-5 text-gray-400"
+                className="h-4 w-4 text-slate-400"
                 aria-hidden="true"
               />
             </span>
@@ -54,13 +68,15 @@ const UserList = ({ setTeam, team }) => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <ListboxOptions className="z-50 absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+            <ListboxOptions className="z-50 absolute mt-1.5 max-h-60 w-full overflow-auto rounded-xl bg-white dark:bg-slate-800 p-1 text-sm shadow-xl ring-1 ring-black/5 dark:ring-white/10 border border-slate-200 dark:border-slate-700 focus:outline-none">
               {data?.map((user, index) => (
                 <ListboxOption
-                  key={index}
+                  key={user._id || index}
                   className={({ active }) =>
-                    `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                      active ? "bg-amber-100 text-amber-900" : "text-gray-900"
+                    `relative cursor-pointer select-none py-2 pl-9 pr-4 rounded-lg transition-colors ${
+                      active
+                        ? "bg-blue-50 dark:bg-slate-700 text-blue-600 dark:text-blue-400"
+                        : "text-slate-700 dark:text-slate-200"
                     }`
                   }
                   value={user}
@@ -68,24 +84,29 @@ const UserList = ({ setTeam, team }) => {
                   {({ selected }) => (
                     <>
                       <div
-                        className={`flex items-center gap-2 truncate ${
-                          selected ? "font-medium" : "font-normal"
+                        className={`flex items-center gap-2.5 truncate ${
+                          selected ? "font-semibold text-blue-600 dark:text-blue-400" : "font-normal"
                         }`}
                       >
-                        <div
-                          className={
-                            "w-6 h-6 rounded-full text-white flex items-center justify-center bg-violet-600"
-                          }
-                        >
-                          <span className="text-center text-[10px]">
+                        {user.avatar ? (
+                          <img
+                            src={user.avatar}
+                            alt={user.name}
+                            className="w-6 h-6 rounded-lg object-cover shadow-sm border border-slate-200 dark:border-slate-800"
+                          />
+                        ) : (
+                          <div className="w-6 h-6 rounded-lg text-white dark:text-slate-900 bg-slate-900 dark:bg-white flex items-center justify-center font-mono text-[10px] font-bold shadow-sm">
                             {getInitials(user.name)}
-                          </span>
+                          </div>
+                        )}
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium">{user.name}</span>
+                          <span className="text-[11px] text-slate-400 dark:text-slate-500">{user.role}</span>
                         </div>
-                        <span>{user.name}</span>
                       </div>
                       {selected ? (
-                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
-                          <MdCheck className="h-5 w-5" aria-hidden="true" />
+                        <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 text-blue-600 dark:text-blue-400">
+                          <MdCheck className="h-4 w-4" aria-hidden="true" />
                         </span>
                       ) : null}
                     </>

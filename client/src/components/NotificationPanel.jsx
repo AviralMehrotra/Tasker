@@ -5,27 +5,15 @@ import {
   Transition,
 } from "@headlessui/react";
 import moment from "moment";
-import { Fragment, useState } from "react";
-import { BiSolidMessageRounded } from "react-icons/bi";
-import { HiBellAlert } from "react-icons/hi2";
-import { IoIosNotificationsOutline } from "react-icons/io";
-import { Link } from "react-router-dom";
+import React, { Fragment, useState } from "react";
+import { Bell, AlertCircle, MessageSquare, CheckCheck } from "lucide-react";
 import {
   useGetNotificationsQuery,
   useMarkNotificationAsReadMutation,
 } from "../redux/slices/api/userApiSlice";
 import ViewNotification from "./ViewNotification";
 
-const ICONS = {
-  alert: (
-    <HiBellAlert className="h-5 w-5 text-gray-600 group-hover:text-indigo-600" />
-  ),
-  message: (
-    <BiSolidMessageRounded className="h-5 w-5 text-gray-600 group-hover:text-indigo-600" />
-  ),
-};
-
-const NotificationPanel = () => {
+export default function NotificationPanel() {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(null);
 
@@ -39,97 +27,106 @@ const NotificationPanel = () => {
   };
 
   const readHandler = async (type, id) => {
-    await markAsRead({ type, id }).unwrap();
+    try {
+      await markAsRead({ type, id }).unwrap();
+    } catch (e) {
+      console.error(e);
+    }
   };
-
-  const callsToAction = [
-    { name: "Cancel", href: "#", icon: "" },
-    {
-      name: "Mark All Read",
-      href: "#",
-      icon: "",
-      onClick: () => readHandler("all", ""),
-    },
-  ];
 
   return (
     <>
       <Popover className="relative">
-        <PopoverButton className="inline-flex items-center outline-none">
-          <div className="w-8 h-8 flex items-center justify-center text-gray-800 relative">
-            <IoIosNotificationsOutline className="text-2xl" />
-            {data?.length > 0 && (
-              <span className="absolute -top-1 -right-1 flex items-center justify-center text-xs text-white font-semibold w-4 h-4 rounded-full bg-red-600">
-                {data?.length}
-              </span>
-            )}
-          </div>
+        <PopoverButton className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative outline-none cursor-pointer">
+          <Bell className="w-5 h-5" />
+          {data?.length > 0 && (
+            <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-slate-900">
+              {data.length > 9 ? "9+" : data.length}
+            </span>
+          )}
         </PopoverButton>
 
         <Transition
           as={Fragment}
           enter="transition ease-out duration-200"
-          enterFrom="opacity-0 translate-y-1"
-          enterTo="opacity-100 translate-y-0"
+          enterFrom="opacity-0 translate-y-2 scale-95"
+          enterTo="opacity-100 translate-y-0 scale-100"
           leave="transition ease-in duration-150"
-          leaveFrom="opacity-100 translate-y-0"
-          leaveTo="opacity-0 translate-y-1"
+          leaveFrom="opacity-100 translate-y-0 scale-100"
+          leaveTo="opacity-0 translate-y-2 scale-95"
         >
-          <PopoverPanel className="absolute -right-16 md:-right-2 z-10 mt-5 flex w-screen max-w-max  px-4">
-            {({ close }) => (
-                <div className="w-screen max-w-md flex-auto overflow-hidden rounded-3xl bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
-                  <div className="p-4">
-                    {data?.length > 0 ? data?.slice(0, 5).map((item, index) => (
-                      <div
-                        key={item._id + index}
-                        className="group relative flex gap-x-4 rounded-lg p-4 hover:bg-gray-50"
-                      >
-                        <div className="mt-1 h-8 w-8 flex items-center justify-center rounded-lg group-hover:bg-white">
-                          {ICONS[item.notiType]}
-                        </div>
+          <PopoverPanel className="absolute right-0 z-50 mt-2 w-80 sm:w-96 rounded-xl bg-white dark:bg-[#10121a] border border-slate-200 dark:border-[#1d202d] shadow-xl overflow-hidden text-sm">
+            {() => (
+              <div>
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-[#1d202d]">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">Notifications</span>
+                    {data?.length > 0 && (
+                      <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900/60 font-semibold tabular-nums">
+                        {data.length} new
+                      </span>
+                    )}
+                  </div>
+                  {data?.length > 0 && (
+                    <button
+                      onClick={() => readHandler("all", "")}
+                      className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <CheckCheck className="w-3.5 h-3.5" />
+                      <span>Mark all read</span>
+                    </button>
+                  )}
+                </div>
 
-                        <div
-                          className="cursor-pointer"
-                          onClick={() => viewHandler(item)}
-                        >
-                          <div className="flex items-center gap-3 font-semibold text-gray-900 capitalize">
-                            <p> {item.notiType}</p>
-                            <span className="text-xs font-normal lowercase">
+                {/* Notification Items */}
+                <div className="max-h-80 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/50">
+                  {data?.length > 0 ? (
+                    data.slice(0, 8).map((item) => (
+                      <div
+                        key={item._id}
+                        onClick={() => viewHandler(item)}
+                        className="p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer flex gap-3 transition-colors"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
+                          {item.notiType === "alert" ? (
+                            <AlertCircle className="w-4 h-4 text-amber-500" />
+                          ) : (
+                            <MessageSquare className="w-4 h-4 text-blue-500" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="text-xs font-bold text-slate-900 dark:text-white capitalize">
+                              {item.notiType}
+                            </span>
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500">
                               {moment(item.createdAt).fromNow()}
                             </span>
                           </div>
-                          <p className="line-clamp-1 mt-1 text-gray-600">
+                          <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 line-clamp-2 leading-relaxed">
                             {item.text}
                           </p>
                         </div>
                       </div>
-                    )) : (
-                      <p className="text-center text-gray-500 py-4">No new notifications</p>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-2 divide-x bg-gray-50">
-                    {callsToAction.map((item) => (
-                      <Link
-                        key={item.name}
-                        onClick={
-                          item?.onClick ? () => item.onClick() : () => close()
-                        }
-                        className="flex items-center justify-center gap-x-2.5 p-3 font-semibold text-blue-600 hover:bg-gray-100"
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
+                    ))
+                  ) : (
+                    <div className="py-8 text-center space-y-2">
+                      <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto text-slate-400 dark:text-slate-500">
+                        <Bell className="w-5 h-5" />
+                      </div>
+                      <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                        All caught up! No unread notifications.
+                      </p>
+                    </div>
+                  )}
                 </div>
-              )
-            }
+              </div>
+            )}
           </PopoverPanel>
         </Transition>
       </Popover>
       <ViewNotification open={open} setOpen={setOpen} el={selected} />
     </>
   );
-};
-
-export default NotificationPanel;
+}

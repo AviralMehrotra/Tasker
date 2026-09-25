@@ -12,6 +12,7 @@ import {
   trashTask,
   updateTask,
   updateTaskStage,
+  updateSubTaskStage,
 } from "../controllers/taskController.js";
 
 const router = express.Router();
@@ -27,12 +28,11 @@ router.get("/:id", protectRoute, getTask);
 router.put("/create-subtask/:id", protectRoute, isAdminRoute, createSubTask);
 router.put("/update/:id", protectRoute, isAdminRoute, updateTask);
 router.put("/change-stage/:id", protectRoute, updateTaskStage);
-
-// router.put(
-//   "/change-status/:taskId/:subTaskId",
-//   protectRoute,
-//   updateSubTaskStage
-// );
+router.put(
+  "/change-status/:taskId/:subTaskId",
+  protectRoute,
+  updateSubTaskStage
+);
 router.put("/:id", protectRoute, isAdminRoute, trashTask);
 
 router.delete(
