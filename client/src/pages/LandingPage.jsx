@@ -31,6 +31,7 @@ export default function LandingPage() {
   const [activeWorkflowTab, setActiveWorkflowTab] = useState("sprint");
   const [demoFilter, setDemoFilter] = useState("all");
   const [copiedShortcut, setCopiedShortcut] = useState(false);
+  const [showStickyCta, setShowStickyCta] = useState(false);
 
   const lenisRef = useRef(null);
 
@@ -58,6 +59,23 @@ export default function LandingPage() {
       cancelAnimationFrame(rafId);
       lenis.destroy();
     };
+  }, []);
+
+  // Monitor scroll position for Tier 1 Sticky Mobile CTA
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const fullHeight = document.documentElement.scrollHeight;
+
+      // Reveal after passing the hero (420px), suppress near bottom to avoid colliding with bottom banner CTA
+      const pastHero = scrollY > 420;
+      const nearBottom = scrollY + windowHeight > fullHeight - 500;
+      setShowStickyCta(pastHero && !nearBottom);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const scrollToSection = (e, sectionId) => {
@@ -1376,31 +1394,54 @@ export default function LandingPage() {
               </ul>
             </div>
 
-            {/* Col 4: Governance */}
+            {/* Col 4: Trust & Compliance */}
             <div className="space-y-3">
               <p className="font-mono text-xs uppercase tracking-wider text-slate-900 dark:text-white font-semibold">
-                Governance
+                Trust & Legal
               </p>
               <ul className="text-xs space-y-2 text-slate-500 dark:text-slate-400">
                 <li>
-                  <span>Role-Based RBAC</span>
+                  <Link to="/privacy" className="hover:text-blue-500 transition-colors">
+                    Privacy Policy
+                  </Link>
                 </li>
                 <li>
-                  <span>Stateless JWT Auth</span>
+                  <Link to="/terms" className="hover:text-blue-500 transition-colors">
+                    Terms of Service
+                  </Link>
                 </li>
                 <li>
-                  <span>Trash Bin Recovery</span>
+                  <Link to="/terms" className="hover:text-blue-500 transition-colors">
+                    RBAC Governance
+                  </Link>
                 </li>
                 <li>
-                  <span>Sanitized XSS Inputs</span>
+                  <a
+                    href="mailto:support@tasker.internal"
+                    className="hover:text-blue-500 transition-colors flex items-center gap-1"
+                  >
+                    <span>Support Desk</span>
+                    <span className="text-[10px] text-slate-400">↗</span>
+                  </a>
                 </li>
               </ul>
             </div>
           </div>
 
-          {/* Bottom Copyright & Keyboard helper */}
+          {/* Bottom Copyright & Legal links */}
           <div className="pt-8 border-t border-slate-200 dark:border-[#1d202d] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-400">
-            <p>© 2026 Tasker Inc. Built for speed, precision, and focus.</p>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-slate-500 dark:text-slate-400">
+              <p>© 2026 Tasker Inc. Built for speed, precision, and focus.</p>
+              <span>•</span>
+              <Link to="/privacy" className="hover:text-blue-500 hover:underline transition-colors">
+                Privacy
+              </Link>
+              <span>•</span>
+              <Link to="/terms" className="hover:text-blue-500 hover:underline transition-colors">
+                Terms
+              </Link>
+            </div>
+
             <p className="flex items-center gap-1.5">
               <span>Press</span>
               <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[10px]">
@@ -1411,6 +1452,45 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* =========================================================================
+          10. STICKY MOBILE CONVERSION CTA (Tier 1 Enhancement)
+      ========================================================================= */}
+      <aside
+        aria-label="Quick action bar"
+        className={`fixed bottom-4 left-4 right-4 z-40 md:hidden transition-all duration-300 ease-out transform ${
+          showStickyCta
+            ? "translate-y-0 opacity-100"
+            : "translate-y-12 opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-white/95 dark:bg-[#0c0e15]/95 backdrop-blur-xl border border-slate-200/90 dark:border-slate-800 shadow-[0_12px_40px_rgba(0,0,0,0.25)]">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-blue-600/10 dark:bg-blue-950/50 border border-blue-500/20 p-1 flex items-center justify-center shrink-0">
+              <img src="/logo.png" alt="Tasker" className="w-full h-full object-contain" />
+            </div>
+            <div className="truncate">
+              <div className="flex items-center gap-1.5">
+                <span className="font-bold text-xs text-slate-900 dark:text-white">Tasker</span>
+                <span className="font-mono text-[9px] uppercase px-1 py-0.2 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                  v2.0
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                Zero-drag task velocity
+              </p>
+            </div>
+          </div>
+
+          <Link
+            to={user ? "/dashboard" : "/login"}
+            className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-semibold text-xs transition-all shadow-md shadow-blue-600/25"
+          >
+            <span>{user ? "Workspace" : "Launch Free"}</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+      </aside>
     </div>
   );
 }

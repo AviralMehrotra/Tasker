@@ -1,0 +1,18 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+Allow: /login
+Allow: /privacy
+Allow: /terms
+
+# Disallow indexing of private workspace routes
+Disallow: /dashboard
+Disallow: /tasks
+Disallow: /my-tasks
+Disallow: /activity
+Disallow: /calendar
+Disallow: /team
+Disallow: /trashed
+Disallow: /task/
+
+Sitemap: https://tasker-pm.vercel.app/sitemap.xml

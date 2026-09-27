@@ -8,13 +8,16 @@ import CalendarView from "./pages/CalendarView";
 import Users from "./pages/Users";
 import TaskDetails from "./pages/TaskDetails";
 import Trash from "./pages/Trash";
+import NotFound from "./pages/NotFound";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 import { Route, Routes, Navigate, Outlet, useLocation } from "react-router-dom";
 import { Toaster } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import { setOpenSidebar } from "./redux/slices/authSlice";
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useRef, useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
 import { Transition } from "@headlessui/react";
 import CommandPalette from "./components/CommandPalette";
@@ -93,7 +96,40 @@ const MobileSidebar = () => {
   );
 };
 
+const ROUTE_TITLES = {
+  "/": "Tasker — Agile Project Orchestration",
+  "/login": "Sign In — Tasker",
+  "/dashboard": "Dashboard — Tasker",
+  "/tasks": "Sprint Tasks — Tasker",
+  "/my-tasks": "My Assigned Tasks — Tasker",
+  "/activity": "Activity Audit — Tasker",
+  "/calendar": "Milestones & Deadlines — Tasker",
+  "/team": "Team Directory — Tasker",
+  "/trashed": "Trash Recovery — Tasker",
+  "/privacy": "Privacy Policy — Tasker",
+  "/terms": "Terms of Service — Tasker",
+};
+
 function App() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const path = location.pathname;
+    if (path.startsWith("/task/")) {
+      document.title = "Task Details — Tasker";
+    } else if (
+      path.startsWith("/completed/") ||
+      path.startsWith("/in-progress/") ||
+      path.startsWith("/todo/")
+    ) {
+      document.title = "Tasks — Tasker";
+    } else if (ROUTE_TITLES[path]) {
+      document.title = ROUTE_TITLES[path];
+    } else {
+      document.title = "404 Page Not Found — Tasker";
+    }
+  }, [location.pathname]);
+
   return (
     <main className="w-full min-h-screen bg-[#fbfbfa] dark:bg-[#08090d] text-slate-900 dark:text-[#f4f4f6] transition-colors duration-200">
       <Routes>
@@ -113,6 +149,10 @@ function App() {
           <Route path="/trashed" element={<Trash />} />
         </Route>
         <Route path="/login" element={<Login />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
+        {/* Wildcard 404 Route */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster richColors />
     </main>
