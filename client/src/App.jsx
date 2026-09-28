@@ -21,6 +21,7 @@ import { Fragment, useRef, useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
 import { Transition } from "@headlessui/react";
 import CommandPalette from "./components/CommandPalette";
+import { Analytics } from "@vercel/analytics/react";
 
 function Layout() {
   const { user } = useSelector((state) => state.auth);
@@ -155,6 +156,7 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster richColors />
+      <Analytics />
     </main>
   );
 }
